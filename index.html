@@ -96,32 +96,61 @@
             opacity: 0.5;
         }
 
+        /* ===== PROFILE IMAGE SECTION ===== */
         .profile-orbit {
             position: relative;
-            width: 100px;
-            height: 100px;
+            width: 110px;
+            height: 110px;
             margin-bottom: 24px;
         }
 
-        .profile-img {
+        .profile-img-wrapper {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            box-shadow:
+                0 0 20px rgba(255, 255, 255, 0.05),
+                0 0 60px rgba(255, 255, 255, 0.03);
+        }
+
+        .profile-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+            display: block;
+            border-radius: 50%;
+        }
+
+        /* Gloss overlay on image */
+        .profile-img-wrapper::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background: linear-gradient(45deg, #111, #333);
-            border: 1px solid var(--border);
-            object-fit: cover;
-            position: relative;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+            background: linear-gradient(
+                160deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                transparent 40%,
+                transparent 100%
+            );
+            pointer-events: none;
         }
 
         .orbit-ring {
             position: absolute;
-            top: -5px; left: -5px; right: -5px; bottom: -5px;
-            border: 1px solid rgba(255,255,255,0.1);
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 50%;
             animation: rotate 10s linear infinite;
         }
@@ -131,11 +160,58 @@
             position: absolute;
             top: -3px;
             left: 50%;
+            transform: translateX(-50%);
             width: 6px;
             height: 6px;
             background: #fff;
             border-radius: 50%;
-            box-shadow: 0 0 10px rgba(255,255,255,0.8);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        .orbit-ring-outer {
+            position: absolute;
+            top: -10px; left: -10px; right: -10px; bottom: -10px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 50%;
+            animation: rotate 18s linear infinite reverse;
+        }
+
+        .orbit-ring-outer::before {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Pulse ring behind image */
+        .pulse-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: pulse 3s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.3);
+                opacity: 0;
+            }
         }
 
         h1 {
@@ -190,19 +266,15 @@
             width: 100%;
         }
 
-        /* Instagram gradient */
         .link-shard.insta::before {
             background: linear-gradient(90deg, rgba(225,48,108,0.15), rgba(131,58,180,0.08), transparent);
         }
-        /* Snapchat */
         .link-shard.snap::before {
             background: linear-gradient(90deg, rgba(255,252,0,0.12), transparent);
         }
-        /* WhatsApp */
         .link-shard.wa::before {
             background: linear-gradient(90deg, rgba(37,211,102,0.15), transparent);
         }
-        /* TikTok */
         .link-shard.tiktok::before {
             background: linear-gradient(90deg, rgba(0,242,234,0.12), rgba(255,0,80,0.06), transparent);
         }
@@ -277,7 +349,6 @@
             box-shadow: 0 15px 30px rgba(255,255,255,0.2);
         }
 
-        /* Toast notification */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -318,8 +389,18 @@
             100% { opacity: 1; transform: translateY(0) scale(1); }
         }
 
+        @keyframes imgEntry {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
         .stagger-entry {
             animation: entry 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+
+        .profile-img-wrapper {
+            opacity: 0;
+            animation: imgEntry 1s cubic-bezier(0.23, 1, 0.32, 1) 0.2s forwards;
         }
 
         .link-shard {
@@ -342,19 +423,22 @@
 <body>
 
     <div class="ambient-light"></div>
-
     <div class="toast" id="toast">Opening link...</div>
 
     <div class="monolith-container stagger-entry">
         <div class="monolith" id="glass-core">
 
+            <!-- ===== PROFILE IMAGE ===== -->
             <div class="profile-orbit">
+                <div class="pulse-ring"></div>
+                <div class="orbit-ring-outer"></div>
                 <div class="orbit-ring"></div>
-                <div class="profile-img">
-                    <svg viewBox="0 0 100 100" style="width:100%; height:100%; padding:25px; fill:white; opacity:0.8">
-                        <path d="M50 10c-22.1 0-40 17.9-40 40s17.9 40 40 40 40-17.9 40-40-17.9-40-40-40zm0 75c-19.3 0-35-15.7-35-35s15.7-35 35-35 35 15.7 35 35-15.7 35-35 35z"/>
-                        <circle cx="50" cy="50" r="15"/>
-                    </svg>
+                <div class="profile-img-wrapper">
+                    <img 
+                        src="https://ik.imagekit.io/0kzbr6cex/Gemini_Generated_Image_5utsw65utsw65uts.png" 
+                        alt="Zaid Mughal"
+                        loading="eager"
+                    >
                 </div>
             </div>
 
