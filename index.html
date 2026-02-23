@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zaid Mughal | Digital Identity</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;700&family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.12);
+            --accent: #ffffff;
+            --font-main: 'Outfit', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            --refraction: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.05) 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--accent);
+            font-family: var(--font-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0.04;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            z-index: 10;
+        }
+
+        .ambient-light {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+        }
+
+        .monolith-container {
+            position: relative;
+            width: 380px;
+            height: 80vh;
+            max-height: 700px;
+            z-index: 5;
+            perspective: 1000px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .monolith {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: var(--glass);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow:
+                0 50px 100px rgba(0,0,0,0.5),
+                inset 0 0 30px rgba(255,255,255,0.02);
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .monolith::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 40px;
+            background: var(--refraction);
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .profile-orbit {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin-bottom: 24px;
+        }
+
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #111, #333);
+            border: 1px solid var(--border);
+            object-fit: cover;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .orbit-ring {
+            position: absolute;
+            top: -5px; left: -5px; right: -5px; bottom: -5px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: rotate 10s linear infinite;
+        }
+
+        .orbit-ring::before {
+            content: "";
+            position: absolute;
+            top: -3px;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255,255,255,0.8);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .handle {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 40px;
+        }
+
+        .links-wrapper {
+            width: 100%;
+            display: grid;
+            gap: 12px;
+            z-index: 2;
+        }
+
+        .link-shard {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            text-decoration: none;
+            color: var(--accent);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            overflow: hidden;
+        }
+
+        .link-shard::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            border-radius: 16px;
+            transition: width 0.4s ease;
+        }
+
+        .link-shard:hover::before {
+            width: 100%;
+        }
+
+        /* Instagram gradient */
+        .link-shard.insta::before {
+            background: linear-gradient(90deg, rgba(225,48,108,0.15), rgba(131,58,180,0.08), transparent);
+        }
+        /* Snapchat */
+        .link-shard.snap::before {
+            background: linear-gradient(90deg, rgba(255,252,0,0.12), transparent);
+        }
+        /* WhatsApp */
+        .link-shard.wa::before {
+            background: linear-gradient(90deg, rgba(37,211,102,0.15), transparent);
+        }
+        /* TikTok */
+        .link-shard.tiktok::before {
+            background: linear-gradient(90deg, rgba(0,242,234,0.12), rgba(255,0,80,0.06), transparent);
+        }
+
+        .link-shard:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.02) translateY(-2px);
+        }
+
+        .link-shard .link-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .link-shard .link-icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+            flex-shrink: 0;
+        }
+
+        .link-shard span {
+            font-size: 0.85rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+        }
+
+        .link-shard .platform-tag {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            opacity: 0.4;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 2;
+        }
+
+        .link-shard.insta:hover { box-shadow: 0 10px 30px rgba(225, 48, 108, 0.15); }
+        .link-shard.snap:hover { box-shadow: 0 10px 30px rgba(255, 252, 0, 0.1); }
+        .link-shard.wa:hover { box-shadow: 0 10px 30px rgba(37, 211, 102, 0.15); }
+        .link-shard.tiktok:hover { box-shadow: 0 10px 30px rgba(0, 242, 234, 0.15); }
+
+        .payment-monolith {
+            margin-top: auto;
+            width: 100%;
+            padding-top: 20px;
+        }
+
+        .pay-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 18px;
+            background: #fff;
+            color: #000;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: 0.3s;
+        }
+
+        .pay-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(255,255,255,0.2);
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            z-index: 999;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotateX(0deg); }
+            50% { transform: translateY(-15px) rotateX(2deg); }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes entry {
+            0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .stagger-entry {
+            animation: entry 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+
+        .link-shard {
+            opacity: 0;
+            animation: entry 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+        .link-shard:nth-child(1) { animation-delay: 0.3s; }
+        .link-shard:nth-child(2) { animation-delay: 0.45s; }
+        .link-shard:nth-child(3) { animation-delay: 0.6s; }
+        .link-shard:nth-child(4) { animation-delay: 0.75s; }
+
+        @media (max-width: 480px) {
+            .monolith-container {
+                width: 90%;
+                height: 85vh;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-light"></div>
+
+    <div class="toast" id="toast">Opening link...</div>
+
+    <div class="monolith-container stagger-entry">
+        <div class="monolith" id="glass-core">
+
+            <div class="profile-orbit">
+                <div class="orbit-ring"></div>
+                <div class="profile-img">
+                    <svg viewBox="0 0 100 100" style="width:100%; height:100%; padding:25px; fill:white; opacity:0.8">
+                        <path d="M50 10c-22.1 0-40 17.9-40 40s17.9 40 40 40 40-17.9 40-40-17.9-40-40-40zm0 75c-19.3 0-35-15.7-35-35s15.7-35 35-35 35 15.7 35 35-15.7 35-35 35z"/>
+                        <circle cx="50" cy="50" r="15"/>
+                    </svg>
+                </div>
+            </div>
+
+            <h1>Zaid Mughal</h1>
+            <div class="handle">@zmaaura // @zaidmughal_14</div>
+
+            <div class="links-wrapper">
+
+                <!-- INSTAGRAM -->
+                <a href="https://www.instagram.com/zmaaura" target="_blank" rel="noopener noreferrer" class="link-shard insta" onclick="showToast('Opening Instagram...')">
+                    <div class="link-left">
+                        <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                            <circle cx="12" cy="12" r="5"/>
+                            <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/>
+                        </svg>
+                        <span>INSTAGRAM</span>
+                    </div>
+                    <span class="platform-tag">@zmaaura</span>
+                </a>
+
+                <!-- SNAPCHAT -->
+                <a href="https://www.snapchat.com/add/zaidmughal_14" target="_blank" rel="noopener noreferrer" class="link-shard snap" onclick="showToast('Opening Snapchat...')">
+                    <div class="link-left">
+                        <svg class="link-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                            <path d="M12 2C9.1 2 6.9 3.4 6.2 6c-.2.8-.2 1.7-.2 2.6 0 .3-.2.5-.5.6-.5.2-1 .3-1.4.5-.5.2-.7.6-.5 1 .1.4.5.6.9.5.3-.1.7-.2 1-.3.1 0 .2 0 .3.1.1.2 0 .5-.1.7-.6 1.2-1.5 2.1-2.6 2.8-.4.3-.5.6-.3 1 .2.3.5.5.9.4.5-.1 1-.3 1.5-.4.2 0 .3 0 .4.1.1.2.2.5.2.7 0 .3.2.5.5.6.7.2 1.4.5 2 .8.8.5 1.6.8 2.6.8s1.8-.3 2.6-.8c.6-.4 1.3-.6 2-.8.3-.1.5-.3.5-.6 0-.3.1-.5.2-.7.1-.2.2-.2.4-.1.5.1 1 .3 1.5.4.4.1.7-.1.9-.4.2-.4.1-.7-.3-1-1.1-.7-2-1.6-2.6-2.8-.1-.2-.2-.5-.1-.7.1-.1.2-.1.3-.1.3.1.7.2 1 .3.4.1.8-.1.9-.5.2-.4 0-.8-.5-1-.4-.2-.9-.3-1.4-.5-.3-.1-.5-.3-.5-.6 0-.9 0-1.8-.2-2.6C17.1 3.4 14.9 2 12 2z"/>
+                        </svg>
+                        <span>SNAPCHAT</span>
+                    </div>
+                    <span class="platform-tag">@zaidmughal_14</span>
+                </a>
+
+                <!-- WHATSAPP -->
+                <a href="https://wa.me/923394807064" target="_blank" rel="noopener noreferrer" class="link-shard wa" onclick="showToast('Opening WhatsApp...')">
+                    <div class="link-left">
+                        <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21"/>
+                            <path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1zm0 0a5 5 0 0 0 5 5m0 0h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1z"/>
+                        </svg>
+                        <span>WHATSAPP</span>
+                    </div>
+                    <span class="platform-tag">message</span>
+                </a>
+
+                <!-- TIKTOK -->
+                <a href="https://www.tiktok.com/@zaidmughal_14" target="_blank" rel="noopener noreferrer" class="link-shard tiktok" onclick="showToast('Opening TikTok...')">
+                    <div class="link-left">
+                        <svg class="link-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1 0-5.78c.27 0 .54.04.8.1v-3.5a6.37 6.37 0 0 0-.8-.05A6.34 6.34 0 0 0 3.15 15.3 6.34 6.34 0 0 0 9.49 21.6a6.34 6.34 0 0 0 6.34-6.34V8.7a8.16 8.16 0 0 0 4.76 1.52v-3.4a4.85 4.85 0 0 1-1-.13z"/>
+                        </svg>
+                        <span>TIKTOK</span>
+                    </div>
+                    <span class="platform-tag">@zaidmughal_14</span>
+                </a>
+
+            </div>
+
+            <div class="payment-monolith">
+                <a href="#" class="pay-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                    Receive Funds
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const card = document.getElementById('glass-core');
+        const container = document.querySelector('.monolith-container');
+
+        container.addEventListener('mousemove', (e) => {
+            const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = (y - centerY) / 15;
+            const rotateY = (centerX - x) / 15;
+            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+
+        container.addEventListener('mouseleave', () => {
+            card.style.transform = `rotateX(0deg) rotateY(0deg)`;
+        });
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+    </script>
+</body>
+</html>
